@@ -1,0 +1,73 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+
+export default function BudgetTool() {
+  const [income, setIncome] = useState(7000);
+  const [goals, setGoals] = useState({
+    tithe: 700,
+    studentLoans: 2000,
+    carPayment: 420,
+    emergencyFund: 1000,
+    rothIRA: 500,
+    houseFund: 1000,
+    livingExpenses: 600,
+    giving: 100,
+    personal: 680,
+  });
+
+  const handleChange = (key, value) => {
+    setGoals({ ...goals, [key]: Number(value) });
+  };
+
+  const total = Object.values(goals).reduce((a, b) => a + b, 0);
+  const balance = income - total;
+
+  return (
+    <div className="grid gap-4 max-w-2xl mx-auto p-4">
+      <h1 className="text-2xl font-bold text-center">Budgeting Tool</h1>
+
+      <Card>
+        <CardContent className="space-y-4 p-4">
+          <Label>Monthly Income</Label>
+          <Input
+            type="number"
+            value={income}
+            onChange={(e) => {
+              const newIncome = Number(e.target.value);
+              setIncome(newIncome);
+              setGoals((prev) => ({ ...prev, tithe: Math.round(newIncome * 0.10) }));
+            }}
+          />
+        </CardContent>
+      </Card>
+
+      {Object.keys(goals).map((key) => (
+        <Card key={key}>
+          <CardContent className="space-y-2 p-4">
+            <Label className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</Label>
+            <Input
+              type="number"
+              value={goals[key]}
+              onChange={(e) => handleChange(key, e.target.value)}
+              disabled={key === "tithe"}
+            />
+          </CardContent>
+        </Card>
+      ))}
+
+      <Card>
+        <CardContent className="p-4 text-center">
+          <p className="text-lg font-semibold">Total Allocated: ${total}</p>
+          <p className={balance < 0 ? "text-red-600" : "text-green-600"}>
+            Remaining Balance: ${balance}
+          </p>
+        </CardContent>
+      </Card>
+
+      <Button className="w-full">Save Budget</Button>
+    </div>
+  );
+}
